@@ -15,6 +15,7 @@ public class Splash extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainActivity.wasVertical = false;
         setContentView(R.layout.splash);
 
         new Handler().postDelayed(new Runnable(){

@@ -1,7 +1,7 @@
 package com.example.admin.mytestapp.fragments;
 
 import android.app.Activity;
-import android.support.v4.app.ListFragment;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +10,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.example.admin.mytestapp.MainActivity;
 import com.example.admin.mytestapp.R;
 
 /**
@@ -17,15 +19,21 @@ import com.example.admin.mytestapp.R;
  */
 
 public class ListsFragment extends android.support.v4.app.ListFragment {
+    private static final int COLOR = Color.rgb(120, 120, 120);
 
     public interface onItemClickListener {
-        public void onArticleSelected(int number);
+        public void onArticleSelected(int number, int id, View view);
     }
 
+    private ListView list;
     private onItemClickListener mCallback;
+    private View previosSelectedView;
 
-    public static String[] arrayOfCity = {"Москва", "Санкт-Петербург",
-            "Казань", "Воронеж", "Челябинск"};
+    public static String[] arrayOfCity = {"Русский", "Японский",
+            "Китайский", "Французский", "Английский", "Украинский",
+            "Болгарский", "Корейский", "Тайваньский", "Инденезийский",
+            "Инденезийский", "Щелковский", "Воронежский", "Челябинский",
+            "Артурский"};
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,6 +43,12 @@ public class ListsFragment extends android.support.v4.app.ListFragment {
          */
         return inflater.inflate(R.layout.fragment_list, null);
     }
+
+    /*public void selectItem(int position) {
+        previosSelectedView.setBackgroundColor(0);
+        previosSelectedView = (View)list.getItemAtPosition(position);
+        previosSelectedView.setBackgroundColor(COLOR);
+    }*/
 
 
     @Override
@@ -46,15 +60,21 @@ public class ListsFragment extends android.support.v4.app.ListFragment {
         И навешиваем обработчик (в данном случае в его роли выступит MainActivity.
          */
 
-        ListView list = (ListView) view.findViewById(R.id.list);
+        list = (ListView) view.findViewById(R.id.list);
         list.setAdapter(new NewsListAdapter(arrayOfCity));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                mCallback.onArticleSelected(position);
+                if ((getId() == R.id.titlesLeft)|| (getId() == R.id.titlesRight)) { // Чтобы на лист просмотра языков нельзя было кликнуть
+                    view.setBackgroundColor(COLOR);
+                    if (previosSelectedView != null) {
+                        previosSelectedView.setBackgroundColor(0);
+                    }
+                    previosSelectedView = view;
+                    mCallback.onArticleSelected(position, getId(), view);
+                }
             }
         });
-
     }
 
 
@@ -69,6 +89,12 @@ public class ListsFragment extends android.support.v4.app.ListFragment {
             mCallback = (onItemClickListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement onSomeEventListener");
+        }
+    }
+
+    public void clearItemColor() {
+        if (previosSelectedView != null) {
+            previosSelectedView.setBackgroundColor(0);
         }
     }
 
