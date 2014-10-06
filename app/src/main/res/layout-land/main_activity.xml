@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/LinearLayout1"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
-    <fragment
-        android:id="@+id/titlesLeft"
-        android:name="com.example.admin.mytestapp.fragments.ListsFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="4">
-    </fragment>
-    <FrameLayout
-        android:id="@+id/details"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="2">
-    </FrameLayout>
-    <fragment
-        android:id="@+id/titlesRight"
-        android:name="com.example.admin.mytestapp.fragments.ListsFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="4">
-    </fragment>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/LinearLayout1"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="horizontal"
+	android:baselineAligned="false">
+
+	<!--из за того что здесь явно были прописаны классы фрагментов, андроид их постоянно пересоздавал, теперь здесь пусто и мы в рантайме сюда подкладываем уже созданные фрагменты-->
+	<FrameLayout
+		android:id="@+id/titlesLeft"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_weight="4" />
+
+	<FrameLayout
+		android:id="@+id/details"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_weight="2" />
+
+	<FrameLayout
+		android:id="@+id/titlesRight"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_weight="4" />
 
 </LinearLayout>
