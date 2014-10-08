@@ -16,8 +16,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
-        <activity android:name=".DetailsActivity"></activity>
+        <activity android:name=".MainActivity"/>
+	    <!-- xml теги с пустым телом объявляйте исопльзую />
+	    и следите за валидностью манифеста!!! -->
     </application>
 
 </manifest>

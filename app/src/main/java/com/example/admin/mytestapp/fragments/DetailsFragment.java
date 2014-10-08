@@ -39,6 +39,8 @@ public class DetailsFragment extends Fragment {
     final String LOG_TAG = "myLogs";
 
     public static DetailsFragment getInstance(int from, int to, String fromText, String toText) {
+        //Лог специально показывающий что этот фрагмент инстанцируется единственнй раз
+        Log.e("", "new DetailFragment");
         DetailsFragment detailsFragment = new DetailsFragment();
         Bundle bundle = new Bundle();
         bundle.putInt(FROM, from);

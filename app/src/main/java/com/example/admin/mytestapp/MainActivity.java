@@ -1,16 +1,15 @@
 package com.example.admin.mytestapp;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.View.OnClickListener;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.EditText;
-
 import com.example.admin.mytestapp.fragments.DetailsFragment;
 import com.example.admin.mytestapp.fragments.ListsFragment;
 
@@ -51,37 +50,43 @@ public class MainActivity extends FragmentActivity
             toText = savedInstanceState.getString(DetailsFragment.TO_TEXT);
         }
 
-        detailsFragment = DetailsFragment.getInstance(from, to, fromText, toText);
 
-        if (findViewById(R.id.titlesRight) != null) { // Горизонтально
+        //не буду здесь комментировать каждую строчку, если внимательно всмотреться, то всё вполне понятно
+        if (getSupportFragmentManager().findFragmentByTag("detailsFragment") == null) {
+            detailsFragment = DetailsFragment.getInstance(from, to, fromText, toText);
+        } else {
+            detailsFragment = (DetailsFragment) getSupportFragmentManager().findFragmentByTag("detailsFragment");
+        }
+
+        if (findViewById(R.id.titlesRight) == null) { // Горизонтально
             isHorisontal = true;
             fTran = getSupportFragmentManager().beginTransaction();
-            fTran.replace(R.id.details, detailsFragment);
+            fTran.replace(R.id.details, detailsFragment, "detailsFragment");
             fTran.commit();
         } else { // Вертикально
+            FragmentManager manager = getSupportFragmentManager();
+            fTran = manager.beginTransaction();
 
-            int count = getSupportFragmentManager().getBackStackEntryCount();
-            if (getSupportFragmentManager().getBackStackEntryCount() != 0) {
-                /*
-                УЗНАТЬ КАК УДАЛЯТЬ!!!!!!!!!!!!!!!!!!!!!!!!!
-                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                НЕ ВЫХОДИТ!!!!!!!!!!!!!!!!
+            fTran.replace(R.id.details, detailsFragment, "detailsFragment");
 
-
-                 */
-                fTran = getSupportFragmentManager().beginTransaction();
-                fTran.remove(getSupportFragmentManager().getFragments().get(1));
-                fTran.addToBackStack(null); //????
-                fTran.commit();
+            if (manager.findFragmentByTag("listsFragment") == null) {
+                listsFragment = new ListsFragment();
+                fTran.replace(R.id.titlesLeft, listsFragment, "listsFragment");
+            } else {
+                listsFragment = (ListsFragment) manager.findFragmentByTag("listsFragment");
+                fTran.attach(listsFragment);
             }
 
-            int count2 = getSupportFragmentManager().getBackStackEntryCount();
-            fTran = getSupportFragmentManager().beginTransaction();
-            fTran.replace(R.id.details, detailsFragment);
+            ListsFragment listsFragmentRight;
+            if (manager.findFragmentByTag("listsFragmentRight") == null) {
+                listsFragmentRight = new ListsFragment();
+                fTran.replace(R.id.titlesRight, listsFragmentRight, "listsFragmentRight");
+            } else {
+                listsFragmentRight = (ListsFragment) manager.findFragmentByTag("listsFragmentRight");
+                fTran.attach(listsFragmentRight);
+            }
+
             fTran.commit();
-            int count3 = getSupportFragmentManager().getBackStackEntryCount();
-            int qwerty = 999;
         }
     }
 
@@ -101,29 +106,21 @@ public class MainActivity extends FragmentActivity
             this.to = pos;
         }
         Log.d(TAG, ListsFragment.arrayOfCity[pos]);
-
-        if (isHorisontal) {
-            /*
-            Если горизонтальная ориентация - заменяем, то, что есть в Детаилс
-             */
-            FragmentTransaction fTran = getSupportFragmentManager().beginTransaction();
-            fTran.replace(R.id.details, detailsFragment);
-            fTran.commit();
-
-        } else {
-            /*
-            Если вертикально добавляем поверх листов свою
-             */
-            FragmentTransaction fTran = getSupportFragmentManager().beginTransaction();
-            fTran.add(R.id.details, detailsFragment);
-            fTran.addToBackStack(null);
-            fTran.commit();
-        }
         //showDetails(position);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        //отцепляем фрагменты чтобы их вновь прицепить в onCreate
+        FragmentManager manager = getSupportFragmentManager();
+        Fragment fragment = manager.findFragmentByTag("listsFragment");
+        if (fragment != null) {
+            FragmentTransaction fTran = manager.beginTransaction();
+            fTran.detach(fragment);
+            fragment = manager.findFragmentByTag("listsFragmentRight");
+            fTran.detach(fragment);
+            fTran.commit();
+        }
         super.onSaveInstanceState(outState);
         outState.putInt(DetailsFragment.FROM, from);
         outState.putInt(DetailsFragment.TO, to);
@@ -183,8 +180,14 @@ public class MainActivity extends FragmentActivity
                 break;
 
             case R.id.menuBtn:
-                FragmentTransaction fTran = getSupportFragmentManager().beginTransaction();
-                listsFragment = new ListsFragment();
+                // переиспользуем фрагмент, не создаём новый
+                FragmentManager manager = getSupportFragmentManager();
+                FragmentTransaction fTran = manager.beginTransaction();
+                if (manager.findFragmentByTag("") == null) {
+                    listsFragment = new ListsFragment();
+                } else {
+                    listsFragment = (ListsFragment) manager.findFragmentByTag("listsFragment");
+                }
                 fTran.add(R.id.details, listsFragment);
                 fTran.addToBackStack(null);
                 fTran.commit();

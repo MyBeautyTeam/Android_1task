@@ -3,6 +3,7 @@ package com.example.admin.mytestapp.fragments;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +11,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.example.admin.mytestapp.MainActivity;
 import com.example.admin.mytestapp.R;
 
 /**
@@ -20,6 +19,13 @@ import com.example.admin.mytestapp.R;
 
 public class ListsFragment extends android.support.v4.app.ListFragment {
     private static final int COLOR = Color.rgb(120, 120, 120);
+
+    public ListsFragment() {
+        //доказывается что инстанцируется по одному разу
+        Log.e("", "new ListFragment");
+        //было обнаружено что андроид сам не сохрянял фрагменты при повороте экрана, пришелось ему об этом насильно сказать
+        setRetainInstance(true);
+    }
 
     public interface onItemClickListener {
         public void onArticleSelected(int number, int id, View view);
