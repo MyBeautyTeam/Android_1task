@@ -16,6 +16,7 @@ import android.view.View.OnClickListener;
 
 import com.example.admin.mytestapp.MainActivity;
 import com.example.admin.mytestapp.R;
+import com.example.admin.mytestapp.languages.LanguageHelper;
 
 /**
  * Created by Admin on 29.09.2014.
@@ -35,6 +36,7 @@ public class DetailsFragment extends Fragment {
     private EditText fromText;
     private EditText toText;
     private int position;
+    private LanguageHelper languageHelper;
 
     final String LOG_TAG = "myLogs";
 
@@ -77,25 +79,27 @@ public class DetailsFragment extends Fragment {
         spinnerTo.setSelection(buf);
     }
 
-    private int getFrom() {
+    public int getFrom() {
         Log.d(MainActivity.TAG + " Details", "getFrom = " + getArguments().getInt(FROM));
         return getArguments().getInt(FROM, 3);
     }
 
-    private int getTo() {
+    public int getTo() {
         return getArguments().getInt(TO, 0);
     }
 
-    private String getFromText() {
+    public String getFromText() {
         return getArguments().getString(FROM_TEXT, "");
     }
 
-    private String getToText() {
+    public String getToText() {
         return getArguments().getString(TO_TEXT, "");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        languageHelper = ((MainActivity)getActivity()).getLanguageHelper();
+
         return inflater.inflate(R.layout.fragment_details, null);
     }
 
@@ -107,7 +111,7 @@ public class DetailsFragment extends Fragment {
         //TextView content = (TextView) view.findViewById(R.id.detailsContent); // ASYNC TASK!!!
         //content.setText("Подробности: \n");// + new Random().nextInt());
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, ListsFragment.arrayOfCity);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, languageHelper.getAllLanguages());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spinnerFrom = (Spinner) view.findViewById(R.id.spiner_from);

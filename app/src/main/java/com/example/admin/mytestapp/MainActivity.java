@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.Spinner;
+
 import com.example.admin.mytestapp.fragments.DetailsFragment;
 import com.example.admin.mytestapp.fragments.ListsFragment;
 import com.example.admin.mytestapp.languages.LanguageHelper;
@@ -39,12 +41,13 @@ public class MainActivity extends FragmentActivity
     private String fromText = "";
     private String toText = "";
     private DetailsFragment detailsFragment;
-    private static ListsFragment listsFragment;
+    private ListsFragment listsFragment;
     private boolean isHorisontal = false;
     public static boolean wasVertical = false;
     public static final String LANGUAGE_FROM = "LANGUAGE_FROM";
     public static final String LANGUAGE_TO = "LANGUAGE_TO";
     public static final String TEXT_LANGUAGE = "TEXT_LANGUAGE";
+    private LanguageHelper languageHelper;
     BroadcastReceiver receiver;
 
     @Override
@@ -57,33 +60,21 @@ public class MainActivity extends FragmentActivity
         ParcelMap mapNameToAlias = getIntent().getParcelableExtra(Splash.MAIN_KEY_OUT1);
         ParcelMap mapAliasToAvailable = getIntent().getParcelableExtra(Splash.MAIN_KEY_OUT2);
         ParcelMap mapAliasToName = getIntent().getParcelableExtra(Splash.MAIN_KEY_OUT3);
-        LanguageHelper languageHelper = new LanguageHelper(mapAliasToAvailable, mapNameToAlias,mapAliasToName ,listOfLang);
+        languageHelper = new LanguageHelper(mapAliasToAvailable, mapNameToAlias,mapAliasToName ,listOfLang);
+
+
+        /*
+        Регистрируем ресивер
+         */
+
         //проверка
-     /*   languageHelper.getAllLanguages();
-        languageHelper.getAvailableLanguage("Русский");
-
-        String  txt = "hand like";
-        String fr = "Английский";
-        String t = "Русский";
-
-
-        Intent intent = new Intent(MainActivity.this, MyIntentService.class);
-        intent.putExtra(LANGUAGE_FROM,languageHelper.getAlias(fr));
-        intent.putExtra(LANGUAGE_TO,languageHelper.getAlias(t));
-        intent.putExtra(TEXT_LANGUAGE,txt);
-        startService(intent);
-
-        receiver = new Receiver();
-        IntentFilter intentFilter = new IntentFilter(
-        LanguageService.ACTION_MYINTENTSERVICE);
-        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(receiver, intentFilter);
-    */
-
+        //languageHelper.getAllLanguages();
+        //languageHelper.getAvailableLanguage("Русский");
 
         FragmentTransaction fTran;
         Log.d(TAG, String.valueOf(1));
         if (savedInstanceState != null) { // Восстанавливаем предыдущие значение
+            languageHelper = new LanguageHelper(mapAliasToAvailable, mapNameToAlias,mapAliasToName ,listOfLang);
             from = savedInstanceState.getInt(DetailsFragment.FROM);
             to = savedInstanceState.getInt(DetailsFragment.TO);
             fromText = savedInstanceState.getString(DetailsFragment.FROM_TEXT);
@@ -131,6 +122,10 @@ public class MainActivity extends FragmentActivity
     }
 
 
+    public LanguageHelper getLanguageHelper() {
+        return this.languageHelper;
+    }
+
     @Override
     public void onArticleSelected(int pos, int id, View view) {
 
@@ -145,7 +140,7 @@ public class MainActivity extends FragmentActivity
             detailsFragment.setTo(pos);
             this.to = pos;
         }
-        Log.d(TAG, ListsFragment.arrayOfCity[pos]);
+        Log.d(TAG, (languageHelper.getAllLanguages())[pos]);
         //showDetails(position);
     }
 
@@ -165,8 +160,8 @@ public class MainActivity extends FragmentActivity
         outState.putInt(DetailsFragment.FROM, from);
         outState.putInt(DetailsFragment.TO, to);
         //outState.put
-        String text = ((EditText)findViewById(R.id.fromText)).getText().toString();
-        String text2 = ((EditText)findViewById(R.id.toText)).getText().toString();
+        //String text = ((EditText)findViewById(R.id.fromText)).getText().toString();
+        //String text2 = ((EditText)findViewById(R.id.toText)).getText().toString();
         outState.putString(DetailsFragment.FROM_TEXT, ((EditText)findViewById(R.id.fromText)).getText().toString());
         outState.putString(DetailsFragment.TO_TEXT, ((EditText)findViewById(R.id.toText)).getText().toString());
     }
@@ -216,7 +211,23 @@ public class MainActivity extends FragmentActivity
                 break;
 
             case R.id.OkBtn:
-                // TODO ASINC_TASK, ЗАПРОС
+
+                Spinner spinner_from = (Spinner) findViewById(R.id.spiner_from);
+                Spinner spinner_to = (Spinner) findViewById(R.id.spiner_to);
+                String []languages = languageHelper.getAllLanguages();
+                Intent intent = new Intent(MainActivity.this, MyIntentService.class);
+                intent.putExtra(LANGUAGE_FROM, languageHelper.getAlias(languages[spinner_from.getSelectedItemPosition()]));
+                intent.putExtra(LANGUAGE_TO, languageHelper.getAlias((languages[spinner_to.getSelectedItemPosition()])));
+                EditText fromEditText = (EditText)findViewById(R.id.fromText);
+                intent.putExtra(TEXT_LANGUAGE, fromEditText.getText().toString());
+                startService(intent);
+
+                Receiver receiver = new Receiver();
+                IntentFilter intentFilter = new IntentFilter(
+                        LanguageService.ACTION_MYINTENTSERVICE);
+                intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+                registerReceiver(receiver, intentFilter);
+
                 break;
 
             case R.id.menuBtn:
@@ -283,7 +294,9 @@ public class MainActivity extends FragmentActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             String translateText = intent.getStringExtra (MyIntentService.TEXT_TRANSLATE);
-            Log.d("translate", translateText);
+            if (translateText != null) {
+                ((EditText) findViewById(R.id.toText)).setText(translateText); // ЗАКЭШИРОВАТЬ!
+            }
         }
     }
 }

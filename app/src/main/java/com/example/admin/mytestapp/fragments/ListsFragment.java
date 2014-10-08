@@ -11,7 +11,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.example.admin.mytestapp.MainActivity;
 import com.example.admin.mytestapp.R;
+import com.example.admin.mytestapp.languages.LanguageHelper;
 
 /**
  * Created by Admin on 29.09.2014.
@@ -19,6 +22,8 @@ import com.example.admin.mytestapp.R;
 
 public class ListsFragment extends android.support.v4.app.ListFragment {
     private static final int COLOR = Color.rgb(120, 120, 120);
+    private LanguageHelper languageHelper;
+    private String[] languageAll;
 
     public ListsFragment() {
         //доказывается что инстанцируется по одному разу
@@ -35,18 +40,14 @@ public class ListsFragment extends android.support.v4.app.ListFragment {
     private onItemClickListener mCallback;
     private View previosSelectedView;
 
-    public static String[] arrayOfCity = {"Русский", "Японский",
-            "Китайский", "Французский", "Английский", "Украинский",
-            "Болгарский", "Корейский", "Тайваньский", "Инденезийский",
-            "Инденезийский", "Щелковский", "Воронежский", "Челябинский",
-            "Артурский"};
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         /*
         Возвращаем вьюху, созданную из XMLки
          */
+        languageHelper = ((MainActivity)getActivity()).getLanguageHelper();
+        languageAll = this.languageHelper.getAllLanguages();
         return inflater.inflate(R.layout.fragment_list, null);
     }
 
@@ -67,7 +68,7 @@ public class ListsFragment extends android.support.v4.app.ListFragment {
          */
 
         list = (ListView) view.findViewById(R.id.list);
-        list.setAdapter(new NewsListAdapter(arrayOfCity));
+        list.setAdapter(new NewsListAdapter(languageAll));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
