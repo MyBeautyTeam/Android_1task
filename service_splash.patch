@@ -1,0 +1,200 @@
+Index: app/src/main/java/com/example/admin/mytestapp/Splash.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/admin/mytestapp/Splash.java	(date 1412089572000)
++++ app/src/main/java/com/example/admin/mytestapp/Splash.java	(revision )
+@@ -1,31 +1,115 @@
+ package com.example.admin.mytestapp;
+ 
+ import android.app.Activity;
++import android.content.BroadcastReceiver;
++import android.content.Context;
+ import android.content.Intent;
++import android.content.IntentFilter;
++import android.os.AsyncTask;
+ import android.os.Bundle;
+-import android.os.Handler;
++import android.util.Log;
+ 
++import com.example.admin.mytestapp.languages.LanguageService;
++
++
++
++
+ /**
+  * Created by Admin on 25.09.2014.
+  */
+ public class Splash extends Activity {
+ 
++    //MyTask mt;
++    public final static String PARAM_RESULT = "result";
+     private final int SPLASH_DISPLAY_LENGTH = 1000;
++    private final String LOG = "MyLog";
++    BroadcastReceiver receiver;
+ 
+     @Override
+     public void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.splash);
++        Intent intent = new Intent(Splash.this, LanguageService.class);
++        startService(intent);
+ 
+-        new Handler().postDelayed(new Runnable(){
++        receiver = new Receiver();
++        IntentFilter intentFilter = new IntentFilter(
++                LanguageService.ACTION_MYINTENTSERVICE);
++        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
++        registerReceiver(receiver, intentFilter);
++     /*  mt = (MyTask) getLastNonConfigurationInstance();
++        if (mt == null) {
++            mt = new MyTask();
++            mt.execute();
++        }
++        mt.link(this);*/
++    }
++
++    /*public Object onRetainNonConfigurationInstance() {
++        mt.unLink();
++        return mt;
++    }
++
++    public class MyTask extends AsyncTask<Void, Void, Void> {
++
++        Splash activity;
++
++        void link(Splash act) {
++            activity = act;
++        }
++
++        void unLink() {
++            activity = null;
++        }
++
+-            @Override
++        @Override
+-            public void run() {
+-                Intent mainIntent = new Intent(Splash.this, MainActivity.class);
+-                Splash.this.startActivity(mainIntent);
+-                Splash.this.finish();
++        protected Void doInBackground(Void... params) {
++            try {
++                Map<String, String> mapAliasToAvaliable = new HashMap<String, String>();
++                Map<String, String> mapNameToAlias = new HashMap<String, String>();
++                Network network=new Network();
++                
++
++                JSONObject json = new JSONObject(network.urlConnection());
++                JSONObject tagName = json.getJSONObject("langs");
++
++                String[] listName = network.getNameList(tagName);
++                mapAliasToAvaliable = network.getMap(json);
++                mapNameToAlias = network.getNameTag(tagName,listName);
++                //LanguageHelper languageHelper = new LanguageHelper(tagName,listName,mapAliasToAvaliable,mapNameToAlias);
++            } catch (IOException e) {
++                Log.e("", e.getLocalizedMessage(), e);
++            } catch (JSONException e) {
++                e.printStackTrace();
+             }
+-        }, SPLASH_DISPLAY_LENGTH);
++            return null;
++        }
+ 
++        @Override
++        protected void onPostExecute(Void aVoid) {
++          //  mEditText.setText("AsyncTask завершен");
++          //  progressBar.setVisibility(View.INVISIBLE);
++        }
++    }*/
+ 
++    @Override
++    protected void onDestroy() {
++        Log.d(LOG, "onDestroy");
++        super.onDestroy();
++        unregisterReceiver(receiver);
++        super.onPause();
++    }
++
++    public class Receiver extends BroadcastReceiver {
++
++        //public final static String PARAM_RESULT = "result";
++        public static final String ACTION = "language.received";
++
++        @Override
++        public void onReceive(Context context, Intent intent) {
++            //String list = intent.getStringExtra (LanguageService.EXTRA_KEY_OUT);
++            String[] list = intent.getStringArrayExtra (LanguageService.EXTRA_KEY_OUT);
++            Log.d(LOG, list[0]);
++        }
+     }
+ }
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/build.gradle	(date 1412089572000)
++++ app/build.gradle	(revision )
+@@ -6,7 +6,7 @@
+ 
+     defaultConfig {
+         applicationId "com.example.admin.mytestapp"
+-        minSdkVersion 15
++        minSdkVersion 14
+         targetSdkVersion 19
+         versionCode 1
+         versionName "1.0"
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/AndroidManifest.xml	(date 1412089572000)
++++ app/src/main/AndroidManifest.xml	(revision )
+@@ -2,6 +2,13 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="com.example.admin.mytestapp" >
+ 
++    <uses-permission android:name="android.permission.INTERNET" />
++    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
++    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
++    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
++    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
++    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
++
+     <application
+         android:allowBackup="true"
+         android:icon="@drawable/ic_launcher"
+@@ -16,8 +23,14 @@
+                 <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
+         </activity>
+-        <activity android:name=".MainActivity"></activity>
+-        <activity android:name=".DetailsActivity"></activity>
++        <activity android:name=".MainActivity" />
++        <activity android:name=".DetailsActivity" />
++
++        <service
++            android:name=".languages.LanguageService"
++            android:enabled="true"
++            android:exported="true" >
++        </service>
+     </application>
+ 
+ </manifest>
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/vcs.xml	(date 1412089572000)
++++ .idea/vcs.xml	(revision )
+@@ -4,4 +4,5 @@
+     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+     <mapping directory="$PROJECT_DIR$/TP_Android_1stTask" vcs="Git" />
+   </component>
+-</project>
+\ No newline at end of file
++</project>
++

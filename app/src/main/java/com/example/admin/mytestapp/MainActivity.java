@@ -1,6 +1,10 @@
 package com.example.admin.mytestapp;
 
 import android.os.Bundle;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -12,6 +16,10 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import com.example.admin.mytestapp.fragments.DetailsFragment;
 import com.example.admin.mytestapp.fragments.ListsFragment;
+import com.example.admin.mytestapp.languages.LanguageHelper;
+import com.example.admin.mytestapp.languages.LanguageService;
+import com.example.admin.mytestapp.languages.MyIntentService;
+import com.example.admin.mytestapp.languages.ParcelMap;
 
 import java.util.Iterator;
 import java.util.List;
@@ -34,12 +42,44 @@ public class MainActivity extends FragmentActivity
     private static ListsFragment listsFragment;
     private boolean isHorisontal = false;
     public static boolean wasVertical = false;
+    public static final String LANGUAGE_FROM = "LANGUAGE_FROM";
+    public static final String LANGUAGE_TO = "LANGUAGE_TO";
+    public static final String TEXT_LANGUAGE = "TEXT_LANGUAGE";
+    BroadcastReceiver receiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+
+        String[] listOfLang = getIntent().getStringArrayExtra (Splash.MAIN_KEY_OUT);
+        ParcelMap mapNameToAlias = getIntent().getParcelableExtra(Splash.MAIN_KEY_OUT1);
+        ParcelMap mapAliasToAvailable = getIntent().getParcelableExtra(Splash.MAIN_KEY_OUT2);
+        ParcelMap mapAliasToName = getIntent().getParcelableExtra(Splash.MAIN_KEY_OUT3);
+        LanguageHelper languageHelper = new LanguageHelper(mapAliasToAvailable, mapNameToAlias,mapAliasToName ,listOfLang);
+        //проверка
+     /*   languageHelper.getAllLanguages();
+        languageHelper.getAvailableLanguage("Русский");
+
+        String  txt = "hand like";
+        String fr = "Английский";
+        String t = "Русский";
+
+
+        Intent intent = new Intent(MainActivity.this, MyIntentService.class);
+        intent.putExtra(LANGUAGE_FROM,languageHelper.getAlias(fr));
+        intent.putExtra(LANGUAGE_TO,languageHelper.getAlias(t));
+        intent.putExtra(TEXT_LANGUAGE,txt);
+        startService(intent);
+
+        receiver = new Receiver();
+        IntentFilter intentFilter = new IntentFilter(
+        LanguageService.ACTION_MYINTENTSERVICE);
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(receiver, intentFilter);
+    */
+
 
         FragmentTransaction fTran;
         Log.d(TAG, String.valueOf(1));
@@ -199,6 +239,7 @@ public class MainActivity extends FragmentActivity
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "DESTROY!");
+        unregisterReceiver(receiver);
         /*FragmentManager fm = getSupportFragmentManager();
         for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
             fm.popBackStack();
@@ -237,9 +278,12 @@ public class MainActivity extends FragmentActivity
         // your code here
     }
 
+    public class Receiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String translateText = intent.getStringExtra (MyIntentService.TEXT_TRANSLATE);
+            Log.d("translate", translateText);
+        }
+    }
 }
-/*
-КАК УБРАТЬ ФРАГМЕНТ БЕЗ ОШИБОК!?
-КАК ПЕРЕДАВАТЬ ОДНОВРЕМЕННО putInt И putString
-Передача объекта между активити. Хочу заполнить статик!
- */
