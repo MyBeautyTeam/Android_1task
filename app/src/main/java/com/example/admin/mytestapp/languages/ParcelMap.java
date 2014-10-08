@@ -62,6 +62,6 @@ public class ParcelMap implements Parcelable {
     }
 
     public void putAll(Map <String,String> nameMap) {
-        map = nameMap;
+        map.putAll( nameMap);
     }
 }

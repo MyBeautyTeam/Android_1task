@@ -20,6 +20,9 @@ public class LanguageService extends IntentService {
     final String LOG_TAG = "myLogs";
     public static final String ACTION_MYINTENTSERVICE = ".languages.LanguageService.RESPONSE";
     public static final String EXTRA_KEY_OUT = "EXTRA_OUT";
+    public static final String EXTRA_KEY_OUT1 = "EXTRA_OUT1";
+    public static final String EXTRA_KEY_OUT2 = "EXTRA_OUT2";
+    public static final String EXTRA_KEY_OUT3 = "EXTRA_OUT3";
 
     public LanguageService() {
         super("myname");
@@ -39,28 +42,36 @@ public class LanguageService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         // TODO Auto-generated method stub
         try {
-            Map<String, String> mapAliasToAvaliable = new HashMap<String, String>();
+            Map<String, String> mapAliasToAvailable = new HashMap<String, String>();
             Map<String, String> mapNameToAlias = new HashMap<String, String>();
+            Map<String, String> mapAliasToName = new HashMap<String, String>();
             Network network=new Network();
-
 
             JSONObject json = new JSONObject(network.urlConnection());
             JSONObject tagName = json.getJSONObject("langs");
 
             String[] listName = network.getNameList(tagName);
-            mapAliasToAvaliable = network.getMap(json);
+            mapAliasToName = network.getMapAliasToName(tagName);
             mapNameToAlias = network.getNameTag(tagName,listName);
+            mapAliasToAvailable = network.getMap(json);
+
         // возвращаем результат
-            ParcelMap p = new ParcelMap();
-            System.out.println(mapNameToAlias);
-            p.putAll(mapNameToAlias);
-            System.out.println(p);
+            ParcelMap parcelMapAliasToName = new ParcelMap();
+            parcelMapAliasToName.putAll(mapAliasToName);
+
+            ParcelMap parcelMapToAlias = new ParcelMap();
+            parcelMapToAlias.putAll(mapNameToAlias);
+
+            ParcelMap parcelMapAliasToAvailable = new ParcelMap();
+            parcelMapAliasToAvailable.putAll(mapAliasToAvailable);
+
             Intent intentResponse = new Intent();
             intentResponse.setAction(ACTION_MYINTENTSERVICE);
             intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
             intentResponse.putExtra(EXTRA_KEY_OUT, listName);
-            intent.putExtra("MapAlias", p);
-            // intentResponse.put(EXTRA_KEY_OUT2, mapAl)
+            intentResponse.putExtra(EXTRA_KEY_OUT1, parcelMapToAlias);
+            intentResponse.putExtra(EXTRA_KEY_OUT2, parcelMapAliasToAvailable);
+            intentResponse.putExtra(EXTRA_KEY_OUT3, parcelMapAliasToName);
             sendBroadcast(intentResponse);
         } catch (JSONException e) {
             e.printStackTrace();

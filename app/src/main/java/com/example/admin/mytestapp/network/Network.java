@@ -34,6 +34,21 @@ public class Network {
             return str;
         }
 
+        public String urlConnection(String from,String to, String text) throws IOException {
+            String urlTranslate = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20140930T153442Z.105b1ec04823ba60.5c5ef51913657c82847062d4086a34017f00f3ea&text="+text+"&lang="+from + "-" + to;
+            URL url = new URL(urlTranslate);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
+            int code = connection.getResponseCode();
+            String str = "";
+            if (code == 200) {
+                InputStream in = connection.getInputStream();
+                str = handleInputStream(in);
+            }
+            return str;
+        }
+
         private String handleInputStream(InputStream in) throws IOException {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String result = "", line = "";
@@ -54,6 +69,16 @@ public class Network {
             }
             return nameList;
         }
+
+
+    public Map getMapAliasToName(JSONObject lang) throws IOException, JSONException {
+        Map<String, String> mapAliasToName = new HashMap<String, String>();
+        JSONArray tagArray = lang.names();
+        for (int i=0; i < tagArray.length(); i++) {
+            mapAliasToName.put(tagArray.getString(i),lang.getString(tagArray.getString(i)));
+        }
+        return mapAliasToName;
+    }
 
     public Map getMap(JSONObject json) throws IOException, JSONException {
         String key;

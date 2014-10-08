@@ -16,6 +16,11 @@ import com.example.admin.mytestapp.languages.ParcelMap;
  */
 public class Splash extends Activity {
 
+    public static final String ACTION_MAININTENT = ".languages.LanguageService.RESPONSE";
+    public static final String MAIN_KEY_OUT = "MAIN_OUT";
+    public static final String MAIN_KEY_OUT1 = "MAIN_OUT1";
+    public static final String MAIN_KEY_OUT2 = "MAIN_OUT2";
+    public static final String MAIN_KEY_OUT3 = "MAIN_OUT3";
     public final static String PARAM_RESULT = "result";
     private final int SPLASH_DISPLAY_LENGTH = 1000;
     private final String LOG = "MyLog";
@@ -43,22 +48,24 @@ public class Splash extends Activity {
         Log.d(LOG, "onDestroy");
         super.onDestroy();
         unregisterReceiver(receiver);
-        super.onPause();
     }
 
     public class Receiver extends BroadcastReceiver {
 
-        //public final static String PARAM_RESULT = "result";
-        public static final String ACTION = "language.received";
-
         @Override
         public void onReceive(Context context, Intent intent) {
-            ParcelMap mapAliasToAvaliable = new ParcelMap();
-            String[] list = intent.getStringArrayExtra (LanguageService.EXTRA_KEY_OUT);
-            mapAliasToAvaliable = intent.getParcelableExtra("MapAlias");
-            System.out.println(mapAliasToAvaliable);
-            Log.d(LOG, list[2]);
+            String[] listOfLang = intent.getStringArrayExtra (LanguageService.EXTRA_KEY_OUT);
+            ParcelMap mapNameToAlias = intent.getParcelableExtra(LanguageService.EXTRA_KEY_OUT1);
+            ParcelMap mapAliasToAvailable = intent.getParcelableExtra(LanguageService.EXTRA_KEY_OUT2);
+            ParcelMap mapAliasToName = intent.getParcelableExtra(LanguageService.EXTRA_KEY_OUT3);
+
             Intent mainIntent = new Intent(Splash.this, MainActivity.class);
+            mainIntent.setAction(ACTION_MAININTENT);
+            mainIntent.addCategory(Intent.CATEGORY_DEFAULT);
+            mainIntent.putExtra(MAIN_KEY_OUT, listOfLang);
+            mainIntent.putExtra(MAIN_KEY_OUT2, mapAliasToAvailable);
+            mainIntent.putExtra(MAIN_KEY_OUT1, mapNameToAlias);
+            mainIntent.putExtra(MAIN_KEY_OUT3, mapAliasToName);
             Splash.this.startActivity(mainIntent);
             Splash.this.finish();
         }
