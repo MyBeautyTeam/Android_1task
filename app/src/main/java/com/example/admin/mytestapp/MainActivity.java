@@ -39,7 +39,6 @@ public class MainActivity extends FragmentActivity
 
     private DetailsFragment detailsFragment;
     private ListsFragment listsFragment;
-    public static boolean wasVertical = false;
 
     public static final String LANGUAGE_FROM = "LANGUAGE_FROM";
     public static final String LANGUAGE_TO = "LANGUAGE_TO";
@@ -58,19 +57,10 @@ public class MainActivity extends FragmentActivity
         ParcelMap mapNameToAlias = getIntent().getParcelableExtra(Splash.MAIN_KEY_OUT1);
         ParcelMap mapAliasToAvailable = getIntent().getParcelableExtra(Splash.MAIN_KEY_OUT2);
         ParcelMap mapAliasToName = getIntent().getParcelableExtra(Splash.MAIN_KEY_OUT3);
-        languageHelper = new LanguageHelper(mapAliasToAvailable, mapNameToAlias,mapAliasToName ,listOfLang);
-
-
-        /*
-        Регистрируем ресивер
-         */
-
-        //проверка
-        //languageHelper.getAllLanguages();
-        //languageHelper.getAvailableLanguage("Русский");
+        languageHelper = new LanguageHelper(mapAliasToAvailable, mapNameToAlias, mapAliasToName, listOfLang);
 
         FragmentTransaction fTran;
-        Log.d(TAG, String.valueOf(1));
+
         languageHelper = new LanguageHelper(mapAliasToAvailable, mapNameToAlias,mapAliasToName ,listOfLang);
         if (savedInstanceState != null) { // Восстанавливаем предыдущие значение
             from = savedInstanceState.getString(DetailsFragment.FROM);
@@ -88,7 +78,6 @@ public class MainActivity extends FragmentActivity
         }
 
         if (findViewById(R.id.titlesRight) == null) { // Горизонтально
-            //isHorisontal = true;
             fTran = getSupportFragmentManager().beginTransaction();
             fTran.replace(R.id.details, detailsFragment, "detailsFragment");
             fTran.commit();
@@ -142,6 +131,7 @@ public class MainActivity extends FragmentActivity
             detailsFragment.setFrom(from);
             listsFragment.makeActualList(from);
         }
+
         if (R.id.titlesRight == id) {
             String from = ((Spinner)findViewById(R.id.spiner_from)).getSelectedItem().toString();
             String to = (languageHelper.getAvailableLanguage(from))[pos];
@@ -176,25 +166,7 @@ public class MainActivity extends FragmentActivity
 
         switch (v.getId()) {
             case R.id.excahngeBtn:
-
                 detailsFragment.exchange();
-
-                /*int buf = to;
-                to = from;
-                from = buf;
-                List <Fragment> list = getSupportFragmentManager().getFragments();
-                Iterator<Fragment> it = list.iterator();
-                Fragment fragment;
-                while (it.hasNext()) {
-                    fragment = it.next();
-                    if (fragment != null&& // Похоже на кастостыль. Один из фрагментов мо
-                            (
-                                (fragment.getId() == R.id.titlesLeft)||
-                                (fragment.getId() == R.id.titlesRight))
-                            )
-                        ((ListsFragment)fragment).clearItemColor();
-
-                }*/
                 break;
 
             case R.id.OkBtn:
@@ -236,22 +208,15 @@ public class MainActivity extends FragmentActivity
     }
 
 
-    @Override
+    @Override// Для Details (Spinner)
     public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
         switch (parentView.getId()) {
             case R.id.spiner_from:
                 String from = parentView.getItemAtPosition(position).toString();
                 detailsFragment.saveTo(from);
-                //this.from = position; ///??
-                //String languageFrom = (languageHelper.getAllLanguages())[position];
-                /*
-                ТАНЯ ДОЛЖНА ВОЗВРАЩАТЬ ["no language"], если нет языка
-                 */
-
-                //detailsFragment.setAvailableSpinnerTo(languageHelper.getAvailableLanguage(languageFrom));
+                if (findViewById(R.id.titlesRight) != null) listsFragment.makeActualList(from);// Если горизонтально меняем содержимое правой части
                 break;
             case R.id.spiner_to:
-                //this.to = position;
         }
 
     }

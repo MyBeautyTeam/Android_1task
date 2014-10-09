@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -27,7 +28,7 @@ import java.util.List;
 public class ListsFragment extends android.support.v4.app.ListFragment {
     private static final int COLOR = Color.rgb(120, 120, 120);
     private LanguageHelper languageHelper;
-    private String[] languageAll;
+    private String[] language;
 
     public ListsFragment() {
         //доказывается что инстанцируется по одному разу
@@ -42,7 +43,6 @@ public class ListsFragment extends android.support.v4.app.ListFragment {
 
     private ListView list;
     private onItemClickListener mCallback;
-    private View previosSelectedView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,33 +51,29 @@ public class ListsFragment extends android.support.v4.app.ListFragment {
         Возвращаем вьюху, созданную из XMLки
          */
         languageHelper = ((MainActivity)getActivity()).getLanguageHelper();
-        languageAll = this.languageHelper.getAllLanguages();
+        language = this.languageHelper.getAllLanguages();
         return inflater.inflate(R.layout.fragment_list, null);
     }
-
-    /*public void selectItem(int position) {
-        previosSelectedView.setBackgroundColor(0);
-        previosSelectedView = (View)list.getItemAtPosition(position);
-        previosSelectedView.setBackgroundColor(COLOR);
-    }*/
 
     /*
     Функция, обновляющая правый список.
     PS. АХУЕТЬ, ОНА РАБОТАЕТ!
      */
-    public void makeActualList(String from) {
-        List<Fragment> fragments = getActivity().getSupportFragmentManager().getFragments();
-        Iterator<Fragment> it = fragments.iterator();
-        while (it.hasNext()){
-            Fragment fragment = it.next();
-            if ((fragment != null)&&(fragment.getId() == R.id.titlesRight)) { // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   ВЕРОЯТНЫЙ КОСТЫЛЬ
-                ListView listView =(ListView) fragment.getView().findViewById(R.id.list);
-                listView.setAdapter(new NewsListAdapter(languageHelper.getAvailableLanguage(from)));
 
-            }
-        }
+    public void makeActualList(String from) {
+
+        ListsFragment fragment = (ListsFragment) (getActivity().getSupportFragmentManager().findFragmentById(R.id.titlesRight));
+        ListView rightList =(ListView) fragment.getView().findViewById(R.id.list);
+
+        rightList.setAdapter(new NewsListAdapter(languageHelper.getAvailableLanguage(from)));
+        //fragment.setLanguage(languageHelper.getAvailableLanguage(from)); ЭТО НЕ ЗАРАБОТАЛО!
+        //((BaseAdapter)rightList.getAdapter()).notifyDataSetChanged();
+
     }
 
+    public void setLanguage(String[] language) {
+        this.language = language;
+    }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -89,16 +85,11 @@ public class ListsFragment extends android.support.v4.app.ListFragment {
          */
 
         list = (ListView) view.findViewById(R.id.list);
-        list.setAdapter(new NewsListAdapter(languageAll));
+        list.setAdapter(new NewsListAdapter(language));
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 if ((getId() == R.id.titlesLeft)|| (getId() == R.id.titlesRight)) { // Чтобы на лист просмотра языков нельзя было кликнуть
-                    view.setBackgroundColor(COLOR);
-                    if (previosSelectedView != null) {
-                        previosSelectedView.setBackgroundColor(0);
-                    }
-                    previosSelectedView = view;
                     mCallback.onArticleSelected(position, getId(), view);
                 }
             }
@@ -117,12 +108,6 @@ public class ListsFragment extends android.support.v4.app.ListFragment {
             mCallback = (onItemClickListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement onSomeEventListener");
-        }
-    }
-
-    public void clearItemColor() {
-        if (previosSelectedView != null) {
-            previosSelectedView.setBackgroundColor(0);
         }
     }
 
@@ -155,7 +140,6 @@ public class ListsFragment extends android.support.v4.app.ListFragment {
         }
 
         private class ViewHolder {
-
             public TextView text;
         }
     }

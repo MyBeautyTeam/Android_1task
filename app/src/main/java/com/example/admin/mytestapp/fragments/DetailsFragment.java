@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -112,25 +113,16 @@ public class DetailsFragment extends Fragment {
 
         languageAvailable = languageHelper.getAvailableLanguage(to);
 
-        spinnerFrom.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, languageAll));
-        spinnerTo.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, languageAvailable));
+        //spinnerFrom.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, languageAll));
+        //spinnerTo.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, languageAvailable));
+        ((BaseAdapter)spinnerTo.getAdapter()).notifyDataSetChanged();
         setFrom(to);
         setTo(from);
 
-        /*for (int i=0; i<languageAll.length; i++) {
-            if (spinnerFrom.getItemAtPosition(i).toString().equals(to))
-                spinnerFrom.setSelection(i);
-        }
-
-        for (int i=0; i<languageAvailable.length; i++) {
-            if (spinnerTo.getItemAtPosition(i).toString().equals(from))
-                spinnerTo.setSelection(i);
-        }*/
     }
 
 
     public String getFrom() {
-        Log.d(MainActivity.TAG + " Details", "getFrom = " + getArguments().getInt(FROM));
         return getArguments().getString(FROM, "Английский");
     }
 
@@ -146,30 +138,30 @@ public class DetailsFragment extends Fragment {
         return getArguments().getString(TO_TEXT, "");
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         languageHelper = ((MainActivity)getActivity()).getLanguageHelper();
-
         return inflater.inflate(R.layout.fragment_details, null);
     }
+
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
-        //TextView title = (TextView) view.findViewById(R.id.detailsTitle);
-        //title.setText("Погода в городе " + ListsFragment.arrayOfCity[getPosition()]);
-        //TextView content = (TextView) view.findViewById(R.id.detailsContent); // ASYNC TASK!!!
-        //content.setText("Подробности: \n");// + new Random().nextInt());
         languageAll = languageHelper.getAllLanguages();
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, languageHelper.getAllLanguages());
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+        ArrayAdapter<String> adapterFrom = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, languageAll);
+        adapterFrom.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerFrom = (Spinner) view.findViewById(R.id.spiner_from);
-        spinnerFrom.setAdapter(adapter);
+        spinnerFrom.setAdapter(adapterFrom);
         setFrom(getFrom());
 
+        languageAvailable = languageHelper.getAvailableLanguage(getFrom());
+        ArrayAdapter<String> adapterTo = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, languageAvailable);
+        adapterTo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTo = (Spinner) view.findViewById(R.id.spiner_to);
-        spinnerTo.setAdapter(adapter);
+        spinnerTo.setAdapter(adapterTo);
         setTo(getTo());
 
         Button okBtn = (Button) view.findViewById(R.id.OkBtn);

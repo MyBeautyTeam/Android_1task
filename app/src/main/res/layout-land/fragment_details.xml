@@ -7,66 +7,78 @@
     android:background="#cccccc">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
+        android:layout_height="match_parent"
+        android:orientation="vertical"> <!-- Для всего-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <Spinner
-                android:id="@+id/spiner_from"
-                android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"> <!-- Верхняя половина-->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="5dp">
-            </Spinner>
+                android:orientation="horizontal"> <!-- Верхний ToolBar -->
+                <Spinner
+                    android:id="@+id/spiner_from"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="2dp">
+                </Spinner>
 
-            <Button
-                android:id="@+id/excahngeBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ExChange">
-            </Button>
+                <Button
+                    android:id="@+id/excahngeBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="ExChange">
+                </Button>
+            </LinearLayout>
 
+            <EditText
+                android:id="@+id/fromText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Enter Original Text"
+                android:imeOptions="actionDone"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_weight="1"> <!-- Нижняя половина-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:orientation="horizontal"> <!-- Нижний ToolBar -->
 
-            <EditText
-                android:id="@+id/fromText"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:hint="Enter Original Text"
-                android:minHeight="100dp"
-                android:maxHeight="200dp"
-                android:imeOptions="actionDone"
-                />
-            <Button
-                android:id="@+id/OkBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="OK"/>
+                <Button
+                    android:id="@+id/OkBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="OK"/>
 
-            <Spinner
-                android:id="@+id/spiner_to"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="5dp">
-            </Spinner>
+                <Spinner
+                    android:id="@+id/spiner_to"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="2dp">
+                </Spinner>
+
+            </LinearLayout>
 
             <EditText
                 android:id="@+id/toText"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
                 android:hint="Enjoy of Translate"
-                android:minHeight="100dp"
-                android:maxHeight="200dp"
                 android:imeOptions="actionDone"/>
+
         </LinearLayout>
+
     </LinearLayout>
+
+
+
 </FrameLayout>
