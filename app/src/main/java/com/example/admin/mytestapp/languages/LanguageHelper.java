@@ -38,6 +38,10 @@ public class LanguageHelper {
 
     public String [] getAvailableLanguage(String lang) {
         String availableAlias = mapAliasToAvailable.get(mapNameToAlias.get(lang));
+        if (availableAlias==null) {
+            String [] noLanguage = {"Нет языка"};
+            return noLanguage;
+        }
         String[] listAvailableLang = availableAlias.split(",");
         if(listAvailableLang != null)
             for(int i = 0; i< listAvailableLang.length; i++) {

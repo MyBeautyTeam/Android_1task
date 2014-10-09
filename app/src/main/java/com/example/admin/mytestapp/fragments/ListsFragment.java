@@ -3,6 +3,7 @@ package com.example.admin.mytestapp.fragments;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,9 @@ import android.widget.TextView;
 import com.example.admin.mytestapp.MainActivity;
 import com.example.admin.mytestapp.R;
 import com.example.admin.mytestapp.languages.LanguageHelper;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by Admin on 29.09.2014.
@@ -56,6 +60,23 @@ public class ListsFragment extends android.support.v4.app.ListFragment {
         previosSelectedView = (View)list.getItemAtPosition(position);
         previosSelectedView.setBackgroundColor(COLOR);
     }*/
+
+    /*
+    Функция, обновляющая правый список.
+    PS. АХУЕТЬ, ОНА РАБОТАЕТ!
+     */
+    public void makeActualList(String from) {
+        List<Fragment> fragments = getActivity().getSupportFragmentManager().getFragments();
+        Iterator<Fragment> it = fragments.iterator();
+        while (it.hasNext()){
+            Fragment fragment = it.next();
+            if ((fragment != null)&&(fragment.getId() == R.id.titlesRight)) { // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   ВЕРОЯТНЫЙ КОСТЫЛЬ
+                ListView listView =(ListView) fragment.getView().findViewById(R.id.list);
+                listView.setAdapter(new NewsListAdapter(languageHelper.getAvailableLanguage(from)));
+
+            }
+        }
+    }
 
 
     @Override
@@ -106,7 +127,7 @@ public class ListsFragment extends android.support.v4.app.ListFragment {
     }
 
 
-    private class NewsListAdapter extends ArrayAdapter<String> { // Свой Адаптер
+    public class NewsListAdapter extends ArrayAdapter<String> { // Свой Адаптер
 
         public NewsListAdapter(String[] objects) {
             super(getActivity(), 0, objects);

@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.example.admin.mytestapp.fragments.DetailsFragment;
@@ -36,8 +38,8 @@ public class MainActivity extends FragmentActivity
 
     private static final String POSITION = "position";
     public static final String TAG = "myLogs123";
-    private int from = 0;
-    private int to = 0;
+    private String from = "Английский";
+    private String to = "Русский";
     private String fromText = "";
     private String toText = "";
     private DetailsFragment detailsFragment;
@@ -55,6 +57,12 @@ public class MainActivity extends FragmentActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+
+        receiver = new Receiver();
+        IntentFilter intentFilter = new IntentFilter(
+                LanguageService.ACTION_MYINTENTSERVICE);
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(receiver, intentFilter);
 
         String[] listOfLang = getIntent().getStringArrayExtra (Splash.MAIN_KEY_OUT);
         ParcelMap mapNameToAlias = getIntent().getParcelableExtra(Splash.MAIN_KEY_OUT1);
@@ -75,8 +83,8 @@ public class MainActivity extends FragmentActivity
         Log.d(TAG, String.valueOf(1));
         if (savedInstanceState != null) { // Восстанавливаем предыдущие значение
             languageHelper = new LanguageHelper(mapAliasToAvailable, mapNameToAlias,mapAliasToName ,listOfLang);
-            from = savedInstanceState.getInt(DetailsFragment.FROM);
-            to = savedInstanceState.getInt(DetailsFragment.TO);
+            from = savedInstanceState.getString(DetailsFragment.FROM);
+            to = savedInstanceState.getString(DetailsFragment.TO);
             fromText = savedInstanceState.getString(DetailsFragment.FROM_TEXT);
             toText = savedInstanceState.getString(DetailsFragment.TO_TEXT);
         }
@@ -126,19 +134,18 @@ public class MainActivity extends FragmentActivity
         return this.languageHelper;
     }
 
-    @Override
+    @Override//ДЛЯ LIST
     public void onArticleSelected(int pos, int id, View view) {
 
-        //DetailsFragment detailsFragment = DetailsFragment.getInstance(this.from, this.to, fromText, toText);
         if (R.id.titlesLeft == id) {
-            //detailsFragment = DetailsFragment.getInstance(pos, this.to, fromText, toText);
-            detailsFragment.setFrom(pos);
-            this.from = pos;
+            String from = (languageHelper.getAllLanguages())[pos];
+            detailsFragment.setFrom(from);
+            listsFragment.makeActualList(from);
         }
         if (R.id.titlesRight == id) {
-            //detailsFragment = DetailsFragment.getInstance(this.from, pos, fromText, toText);
-            detailsFragment.setTo(pos);
-            this.to = pos;
+            String from = ((Spinner)findViewById(R.id.spiner_from)).getSelectedItem().toString();
+            String to = (languageHelper.getAvailableLanguage(from))[pos];
+            detailsFragment.setTo(to);
         }
         Log.d(TAG, (languageHelper.getAllLanguages())[pos]);
         //showDetails(position);
@@ -156,12 +163,10 @@ public class MainActivity extends FragmentActivity
             fTran.detach(fragment);
             fTran.commit();
         }
+
         super.onSaveInstanceState(outState);
-        outState.putInt(DetailsFragment.FROM, from);
-        outState.putInt(DetailsFragment.TO, to);
-        //outState.put
-        //String text = ((EditText)findViewById(R.id.fromText)).getText().toString();
-        //String text2 = ((EditText)findViewById(R.id.toText)).getText().toString();
+        outState.putString(DetailsFragment.FROM, ((Spinner)findViewById(R.id.spiner_from)).getSelectedItem().toString());
+        outState.putString(DetailsFragment.TO, ((Spinner)findViewById(R.id.spiner_to)).getSelectedItem().toString());
         outState.putString(DetailsFragment.FROM_TEXT, ((EditText)findViewById(R.id.fromText)).getText().toString());
         outState.putString(DetailsFragment.TO_TEXT, ((EditText)findViewById(R.id.toText)).getText().toString());
     }
@@ -171,28 +176,10 @@ public class MainActivity extends FragmentActivity
 
         switch (v.getId()) {
             case R.id.excahngeBtn:
-                /*Spinner spinner_from = (Spinner) findViewById(R.id.spiner_from);
-                int from = spinner_from.getSelectedItemPosition();
 
-                Spinner spinner_to = (Spinner) findViewById(R.id.spiner_to);
-                int to = spinner_to.getSelectedItemPosition();
-
-                spinner_to.setSelection(from);
-                spinner_from.setSelection(to);
-                Iterator <Fragment> iterator = getSupportFragmentManager().getFragments().iterator();
-                while(iterator.hasNext()) {
-                    Fragment frag = iterator.next();
-                    if (frag.getId() == R.id.titlesLeft ||
-                            frag.getId() == R.id.titlesRight) {
-                        ((ListsFragment) frag).clearItemColor();
-                    }
-                }
-
-                this.from = to;
-                this.to = from;
-                break;*/
                 detailsFragment.exchange();
-                int buf = to;
+
+                /*int buf = to;
                 to = from;
                 from = buf;
                 List <Fragment> list = getSupportFragmentManager().getFragments();
@@ -206,27 +193,20 @@ public class MainActivity extends FragmentActivity
                                 (fragment.getId() == R.id.titlesRight))
                             )
                         ((ListsFragment)fragment).clearItemColor();
-                        //((ListsFragment)fragment).clearItemColor();
-                }
+
+                }*/
                 break;
 
             case R.id.OkBtn:
 
                 Spinner spinner_from = (Spinner) findViewById(R.id.spiner_from);
                 Spinner spinner_to = (Spinner) findViewById(R.id.spiner_to);
-                String []languages = languageHelper.getAllLanguages();
                 Intent intent = new Intent(MainActivity.this, MyIntentService.class);
-                intent.putExtra(LANGUAGE_FROM, languageHelper.getAlias(languages[spinner_from.getSelectedItemPosition()]));
-                intent.putExtra(LANGUAGE_TO, languageHelper.getAlias((languages[spinner_to.getSelectedItemPosition()])));
+                intent.putExtra(LANGUAGE_FROM, languageHelper.getAlias(spinner_from.getSelectedView().toString()));
+                intent.putExtra(LANGUAGE_TO, languageHelper.getAlias(spinner_to.getSelectedView().toString()));
                 EditText fromEditText = (EditText)findViewById(R.id.fromText);
                 intent.putExtra(TEXT_LANGUAGE, fromEditText.getText().toString());
                 startService(intent);
-
-                Receiver receiver = new Receiver();
-                IntentFilter intentFilter = new IntentFilter(
-                        LanguageService.ACTION_MYINTENTSERVICE);
-                intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
-                registerReceiver(receiver, intentFilter);
 
                 break;
 
@@ -246,40 +226,37 @@ public class MainActivity extends FragmentActivity
         }
     }
 
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "DESTROY!");
-        unregisterReceiver(receiver);
-        /*FragmentManager fm = getSupportFragmentManager();
-        for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
-            fm.popBackStack();
-        }
-        */
 
-        /*
-        List<Fragment> list = getSupportFragmentManager().getFragments();
-        Iterator<Fragment> it = list.iterator();
-        FragmentTransaction fTran = getSupportFragmentManager().beginTransaction();
-        Fragment fragment;
-        while (it.hasNext()) {
-            fragment = it.next();
-            fTran.remove(fragment);
-        }
-        fTran.addToBackStack(null);
-        fTran.commit();*/
     }
 
-    /* !!!!!!!!!!!!!!!!! SPINNER SELECTOR*/
 
     @Override
     public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
         switch (parentView.getId()) {
             case R.id.spiner_from:
-                this.from = position;
+                String from = parentView.getItemAtPosition(position).toString();
+                detailsFragment.saveTo(from);
+                //this.from = position; ///??
+                //String languageFrom = (languageHelper.getAllLanguages())[position];
+                /*
+                ТАНЯ ДОЛЖНА ВОЗВРАЩАТЬ ["no language"], если нет языка
+                 */
+
+                //detailsFragment.setAvailableSpinnerTo(languageHelper.getAvailableLanguage(languageFrom));
                 break;
             case R.id.spiner_to:
-                this.to = position;
+                //this.to = position;
         }
 
     }
