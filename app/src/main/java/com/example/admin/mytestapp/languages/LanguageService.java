@@ -18,7 +18,7 @@ import java.util.Map;
 public class LanguageService extends IntentService {
 
     final String LOG_TAG = "myLogs";
-    public static final String ACTION_MYINTENTSERVICE = ".languages.LanguageService.RESPONSE";
+    public static final String ACTION_LANGUAGESERVICE = ".languages.LanguageService.RESPONSE";
     public static final String EXTRA_KEY_OUT = "EXTRA_OUT";
     public static final String EXTRA_KEY_OUT1 = "EXTRA_OUT1";
     public static final String EXTRA_KEY_OUT2 = "EXTRA_OUT2";
@@ -66,7 +66,7 @@ public class LanguageService extends IntentService {
             parcelMapAliasToAvailable.putAll(mapAliasToAvailable);
 
             Intent intentResponse = new Intent();
-            intentResponse.setAction(ACTION_MYINTENTSERVICE);
+            intentResponse.setAction(ACTION_LANGUAGESERVICE);
             intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
             intentResponse.putExtra(EXTRA_KEY_OUT, listName);
             intentResponse.putExtra(EXTRA_KEY_OUT1, parcelMapToAlias);

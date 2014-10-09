@@ -2,7 +2,6 @@ package com.example.admin.mytestapp.languages;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.content.Context;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -13,20 +12,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
-public class MyIntentService extends IntentService {
+public class TranslateService extends IntentService {
 
     final String LOG_TAG = "myLogs";
-    public static final String ACTION_MYINTENTSERVICE = ".languages.MyIntentService.RESPONSE";
+    public static final String ACTION_TRANSLATESERVICE = ".languages.TranslateService.RESPONSE";
     public static final String EXTRA_KEY_OUT = "EXTRA_OUT";
     public static final String EXTRA_KEY_OUT1 = "EXTRA_OUT1";
     public static final String EXTRA_KEY_OUT2 = "EXTRA_OUT2";
     public static final String EXTRA_KEY_OUT3 = "EXTRA_OUT3";
     public static final String TEXT_TRANSLATE = "TEXT_TRANSLATE";
 
-    public MyIntentService() {
+    public TranslateService() {
         super("myService");
         // TODO Auto-generated constructor stub
     }
@@ -49,13 +46,16 @@ public class MyIntentService extends IntentService {
             String text = intent.getStringExtra(MainActivity.TEXT_LANGUAGE);
 
             Network network=new Network();
+            Log.d("JSON", "from="+from);
+            Log.d("JSON", "to="+to);
+            Log.d("JSON", "text="+text);
 
             JSONObject json = new JSONObject(network.urlConnection(from, to, text));
             String translateObject = json.getString("text");
             String translateText = translateObject.substring(2,translateObject.length()-2);
             Log.d(LOG_TAG,translateText);
             Intent intentResponse = new Intent();
-            intentResponse.setAction(ACTION_MYINTENTSERVICE);
+            intentResponse.setAction(ACTION_TRANSLATESERVICE);
             intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
             intentResponse.putExtra(TEXT_TRANSLATE, translateText);
             sendBroadcast(intentResponse);

@@ -14,19 +14,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.example.admin.mytestapp.fragments.DetailsFragment;
 import com.example.admin.mytestapp.fragments.ListsFragment;
 import com.example.admin.mytestapp.languages.LanguageHelper;
-import com.example.admin.mytestapp.languages.LanguageService;
-import com.example.admin.mytestapp.languages.MyIntentService;
+import com.example.admin.mytestapp.languages.TranslateService;
 import com.example.admin.mytestapp.languages.ParcelMap;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created by Admin on 29.09.2014.
@@ -36,33 +30,29 @@ public class MainActivity extends FragmentActivity
         OnClickListener,
         AdapterView.OnItemSelectedListener {
 
-    private static final String POSITION = "position";
     public static final String TAG = "myLogs123";
+
     private String from = "Английский";
     private String to = "Русский";
     private String fromText = "";
     private String toText = "";
+
     private DetailsFragment detailsFragment;
     private ListsFragment listsFragment;
-    private boolean isHorisontal = false;
     public static boolean wasVertical = false;
+
     public static final String LANGUAGE_FROM = "LANGUAGE_FROM";
     public static final String LANGUAGE_TO = "LANGUAGE_TO";
     public static final String TEXT_LANGUAGE = "TEXT_LANGUAGE";
+
     private LanguageHelper languageHelper;
-    BroadcastReceiver receiver;
+    BroadcastReceiver translateReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-
-        receiver = new Receiver();
-        IntentFilter intentFilter = new IntentFilter(
-                LanguageService.ACTION_MYINTENTSERVICE);
-        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(receiver, intentFilter);
 
         String[] listOfLang = getIntent().getStringArrayExtra (Splash.MAIN_KEY_OUT);
         ParcelMap mapNameToAlias = getIntent().getParcelableExtra(Splash.MAIN_KEY_OUT1);
@@ -98,7 +88,7 @@ public class MainActivity extends FragmentActivity
         }
 
         if (findViewById(R.id.titlesRight) == null) { // Горизонтально
-            isHorisontal = true;
+            //isHorisontal = true;
             fTran = getSupportFragmentManager().beginTransaction();
             fTran.replace(R.id.details, detailsFragment, "detailsFragment");
             fTran.commit();
@@ -129,6 +119,16 @@ public class MainActivity extends FragmentActivity
         }
     }
 
+    @Override
+    public void onResume() {
+        translateReceiver = new Receiver();
+        IntentFilter intentFilter = new IntentFilter(
+                TranslateService.ACTION_TRANSLATESERVICE);
+        intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(translateReceiver, intentFilter);
+
+        super.onResume();
+    }
 
     public LanguageHelper getLanguageHelper() {
         return this.languageHelper;
@@ -201,10 +201,11 @@ public class MainActivity extends FragmentActivity
 
                 Spinner spinner_from = (Spinner) findViewById(R.id.spiner_from);
                 Spinner spinner_to = (Spinner) findViewById(R.id.spiner_to);
-                Intent intent = new Intent(MainActivity.this, MyIntentService.class);
-                intent.putExtra(LANGUAGE_FROM, languageHelper.getAlias(spinner_from.getSelectedView().toString()));
-                intent.putExtra(LANGUAGE_TO, languageHelper.getAlias(spinner_to.getSelectedView().toString()));
+                Intent intent = new Intent(MainActivity.this, TranslateService.class);
+                intent.putExtra(LANGUAGE_FROM, languageHelper.getAlias(spinner_from.getSelectedItem().toString()));
+                intent.putExtra(LANGUAGE_TO, languageHelper.getAlias(spinner_to.getSelectedItem().toString()));
                 EditText fromEditText = (EditText)findViewById(R.id.fromText);
+                Log.d("JSON", "From TEXT = "+fromEditText.getText().toString());
                 intent.putExtra(TEXT_LANGUAGE, fromEditText.getText().toString());
                 startService(intent);
 
@@ -226,17 +227,10 @@ public class MainActivity extends FragmentActivity
         }
     }
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        //unregisterReceiver(receiver); // EXEPTION!!! RECIEVER IS NOT REGISTER!, поэтому я перенес в Destroy
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(receiver);
+        unregisterReceiver(translateReceiver);
         Log.d(TAG, "DESTROY!");
 
     }
@@ -271,7 +265,7 @@ public class MainActivity extends FragmentActivity
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String translateText = intent.getStringExtra (MyIntentService.TEXT_TRANSLATE);
+            String translateText = intent.getStringExtra (TranslateService.TEXT_TRANSLATE);
             if (translateText != null) {
                 ((EditText) findViewById(R.id.toText)).setText(translateText); // ЗАКЭШИРОВАТЬ!
             }

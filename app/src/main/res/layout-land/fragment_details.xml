@@ -41,25 +41,23 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:hint="Enter Original Text"
+                android:minHeight="100dp"
+                android:maxHeight="200dp"
                 android:imeOptions="actionDone"
                 />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <Button
-                    android:id="@+id/OkBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="OK"/>
+            <Button
+                android:id="@+id/OkBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="OK"/>
 
-                <Spinner
-                    android:id="@+id/spiner_to"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp">
-                </Spinner>
-            </LinearLayout>
+            <Spinner
+                android:id="@+id/spiner_to"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp">
+            </Spinner>
 
             <EditText
                 android:id="@+id/toText"

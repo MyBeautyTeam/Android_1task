@@ -29,7 +29,7 @@ public class Splash extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MainActivity.wasVertical = false;
+        //MainActivity.wasVertical = false;
         setContentView(R.layout.splash);
 
         Intent intent = new Intent(Splash.this, LanguageService.class);
@@ -37,7 +37,7 @@ public class Splash extends Activity {
 
         receiver = new Receiver();
         IntentFilter intentFilter = new IntentFilter(
-                LanguageService.ACTION_MYINTENTSERVICE);
+                LanguageService.ACTION_LANGUAGESERVICE);
         intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(receiver, intentFilter);
 
