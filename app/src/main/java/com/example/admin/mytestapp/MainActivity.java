@@ -81,8 +81,8 @@ public class MainActivity extends FragmentActivity
 
         FragmentTransaction fTran;
         Log.d(TAG, String.valueOf(1));
+        languageHelper = new LanguageHelper(mapAliasToAvailable, mapNameToAlias,mapAliasToName ,listOfLang);
         if (savedInstanceState != null) { // Восстанавливаем предыдущие значение
-            languageHelper = new LanguageHelper(mapAliasToAvailable, mapNameToAlias,mapAliasToName ,listOfLang);
             from = savedInstanceState.getString(DetailsFragment.FROM);
             to = savedInstanceState.getString(DetailsFragment.TO);
             fromText = savedInstanceState.getString(DetailsFragment.FROM_TEXT);
@@ -230,12 +230,13 @@ public class MainActivity extends FragmentActivity
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(receiver);
+        //unregisterReceiver(receiver); // EXEPTION!!! RECIEVER IS NOT REGISTER!, поэтому я перенес в Destroy
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(receiver);
         Log.d(TAG, "DESTROY!");
 
     }
