@@ -20,36 +20,21 @@ package com.example.admin.mytestapp.network;
 
 public class Network {
 
-        public String urlConnection() throws IOException {
-            URL url = new URL("https://translate.yandex.net/api/v1.5/tr.json/getLangs?key=trnsl.1.1.20140930T153442Z.105b1ec04823ba60.5c5ef51913657c82847062d4086a34017f00f3ea&ui=ru");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
-            int code = connection.getResponseCode();
-            String str = "";
-            if (code == 200) {
-                InputStream in = connection.getInputStream();
-                str = handleInputStream(in);
-            }
-            return str;
+    public String urlConnection(String strUrl) throws IOException {
+        URL url = new URL(strUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+        int code = connection.getResponseCode();
+        String str = "";
+        if (code == 200) {
+            InputStream in = connection.getInputStream();
+            str = handleInputStream(in);
         }
+        return str;
+    }
 
-        public String urlConnection(String from,String to, String text) throws IOException {
-            String urlTranslate = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20140930T153442Z.105b1ec04823ba60.5c5ef51913657c82847062d4086a34017f00f3ea&text="+text+"&lang="+from + "-" + to;
-            URL url = new URL(urlTranslate);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
-            int code = connection.getResponseCode();
-            String str = "";
-            if (code == 200) {
-                InputStream in = connection.getInputStream();
-                str = handleInputStream(in);
-            }
-            return str;
-        }
-
-        private String handleInputStream(InputStream in) throws IOException {
+    private String handleInputStream(InputStream in) throws IOException {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String result = "", line = "";
             while ((line = reader.readLine()) != null) {

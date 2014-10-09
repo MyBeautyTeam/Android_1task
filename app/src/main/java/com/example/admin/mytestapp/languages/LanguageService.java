@@ -24,6 +24,8 @@ public class LanguageService extends IntentService {
     public static final String EXTRA_KEY_OUT2 = "EXTRA_OUT2";
     public static final String EXTRA_KEY_OUT3 = "EXTRA_OUT3";
 
+    private final String url = "https://translate.yandex.net/api/v1.5/tr.json/getLangs?key=trnsl.1.1.20140930T153442Z.105b1ec04823ba60.5c5ef51913657c82847062d4086a34017f00f3ea&ui=ru";
+
     public LanguageService() {
         super("myname");
         // TODO Auto-generated constructor stub
@@ -40,14 +42,15 @@ public class LanguageService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        // TODO Auto-generated method stub
+// TODO Auto-generated method stub
         try {
+
             Map<String, String> mapAliasToAvailable = new HashMap<String, String>();
             Map<String, String> mapNameToAlias = new HashMap<String, String>();
             Map<String, String> mapAliasToName = new HashMap<String, String>();
             Network network=new Network();
 
-            JSONObject json = new JSONObject(network.urlConnection());
+            JSONObject json = new JSONObject(network.urlConnection(url));
             JSONObject tagName = json.getJSONObject("langs");
 
             String[] listName = network.getNameList(tagName);
@@ -55,7 +58,7 @@ public class LanguageService extends IntentService {
             mapNameToAlias = network.getNameTag(tagName,listName);
             mapAliasToAvailable = network.getMap(json);
 
-        // возвращаем результат
+// возвращаем результат
             ParcelMap parcelMapAliasToName = new ParcelMap();
             parcelMapAliasToName.putAll(mapAliasToName);
 

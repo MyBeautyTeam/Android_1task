@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 public class TranslateService extends IntentService {
 
@@ -22,6 +23,7 @@ public class TranslateService extends IntentService {
     public static final String EXTRA_KEY_OUT2 = "EXTRA_OUT2";
     public static final String EXTRA_KEY_OUT3 = "EXTRA_OUT3";
     public static final String TEXT_TRANSLATE = "TEXT_TRANSLATE";
+    private String urlTranslate = "https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20140930T153442Z.105b1ec04823ba60.5c5ef51913657c82847062d4086a34017f00f3ea&text=";
 
     public TranslateService() {
         super("myService");
@@ -39,18 +41,19 @@ public class TranslateService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        // TODO Auto-generated method stub
+// TODO Auto-generated method stub
         try {
             String from= intent.getStringExtra(MainActivity.LANGUAGE_FROM);
             String to = intent.getStringExtra(MainActivity.LANGUAGE_TO);
             String text = intent.getStringExtra(MainActivity.TEXT_LANGUAGE);
-
+            text = text.replaceAll("\n"," ");
+            URLEncoder.encode(text, "UTF-8");
             Network network=new Network();
             Log.d("JSON", "from="+from);
             Log.d("JSON", "to="+to);
             Log.d("JSON", "text="+text);
 
-            JSONObject json = new JSONObject(network.urlConnection(from, to, text));
+            JSONObject json = new JSONObject(network.urlConnection(urlTranslate+text+"&lang="+from + "-" + to));
             String translateObject = json.getString("text");
             String translateText = translateObject.substring(2,translateObject.length()-2);
             Log.d(LOG_TAG,translateText);
